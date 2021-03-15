@@ -19,6 +19,6 @@ services:
     command: mongod --smallfiles --logpath=/dev/null # --quiet
 
   web:
-    build: app
+    build: .
     ports:
       - '8000:8000'
