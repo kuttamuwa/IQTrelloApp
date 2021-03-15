@@ -1,24 +1,59 @@
 version: '3.6'
 services:
-  mongodb:
-    restart: always
-    image: mongo:latest
-    container_name: "mongodb"
-    environment:
-      - MONGO_INITDB_DATABASE=iqmongodb
-      - MONGO_INITDB_ROOT_USERNAME=iquser
-      - MONGO_INITDB_ROOT_PASSWORD=figo1190
-      - MONGODB_USERNAME='iquser'
-      - MONGODB_PASSWORD='figo1190'
-      - MONGODB_DATABASE=='iqmongodb'
+#  mongodb:
+#    image: mongo:latest
+#    container_name: mongoimg
+#    environment:
+#      - MONGO_INITDB_DATABASE=iqmongodb
+#      - MONGO_INITDB_ROOT_USERNAME=iquser
+#      - MONGO_INITDB_ROOT_PASSWORD=figo1190
+#
+#    volumes:
+#      - ./data/db:/var/micro-data/mongodb/data/db
+#    ports:
+#      - 27017:27017
+#    command: mongod --smallfiles --logpath=/dev/null # --quiet
 
-    volumes:
-      - ./data/db:/var/micro-data/mongodb/data/db
-    ports:
-      - 27017:27017
-    command: mongod --smallfiles --logpath=/dev/null # --quiet
+#  migration:
+#    build: .
+#    image: iqtrello
+#    command: python manage.py migrate
+#    depends_on:
+#      - makemigration
 
-  web:
+  testcon:
+    container_name: testcon
     build: .
-    ports:
-      - '8000:8000'
+    image: iqtrello
+    command: python ctest.py
+    depends_on:
+#      - mongodb
+      - installation
+
+  installation:
+    container_name: app
+    build: .
+    image: iqtrello
+    command: pip install -r requirements.txt
+
+
+
+#  makemigration:
+#    build: .
+#    image: makemigration
+#    command: python manage.py makemigrations
+#    depends_on:
+#      - testcon
+
+#  iqtrelloapp:
+#    stdin_open: true
+#    tty: true
+#    image: iqtrello
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    depends_on:
+#      - mongodb
+#      - migration
+#    ports:
+#      - '8000:8000'
