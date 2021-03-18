@@ -86,12 +86,17 @@ WSGI_APPLICATION = 'IQTrelloLatest.wsgi.application'
 
 DATABASES = {
     'default': {
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         'ENGINE': 'djongo',
-        'NAME': 'iqmongodb',
-        'HOST': '127.0.0.1',
+        'ENFORCE_SCHEMA': True,
+        'NAME': 'iqtrellodb',
+        'HOST': 'mongodb',
         'PORT': 27017,
-        'USER': 'iquser',
-        'PASSWORD': 'figo1190'
+        'USER': 'root',
+        'PASSWORD': 'mongoadmin',
+        'AUTH_SOURCE': 'admin',
+        'AUTH_MECHANISM': 'SCRAM-SHA-1',
     }
 }
 

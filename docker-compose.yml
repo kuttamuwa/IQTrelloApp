@@ -1,59 +1,63 @@
-version: '3.6'
+version: '3.1'
+
+volumes:
+  init-db:
+  data-db:
+
 services:
-#  mongodb:
-#    image: mongo:latest
-#    container_name: mongoimg
-#    environment:
-#      - MONGO_INITDB_DATABASE=iqmongodb
-#      - MONGO_INITDB_ROOT_USERNAME=iquser
-#      - MONGO_INITDB_ROOT_PASSWORD=figo1190
-#
-#    volumes:
-#      - ./data/db:/var/micro-data/mongodb/data/db
-#    ports:
-#      - 27017:27017
-#    command: mongod --smallfiles --logpath=/dev/null # --quiet
+  mongodb:
+    image: mongo
+    restart: always
+    volumes:
+      - ./init-db:/docker-entrypoint-initdb.d
+      - ./data-db:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: mongoadmin
+      MONGO_INITDB_DATABASE: iqtrellodb
+    ports:
+      - 27017:27017
 
-#  migration:
-#    build: .
-#    image: iqtrello
-#    command: python manage.py migrate
-#    depends_on:
-#      - makemigration
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: mongoadmin
 
-  testcon:
-    container_name: testcon
-    build: .
-    image: iqtrello
-    command: python ctest.py
+  web:
+    image: app
+    restart: always
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/django_mongodb_docker
+    ports:
+      - 8000:8000
+    links:
+      - mongodb
     depends_on:
-#      - mongodb
-      - installation
+      - migration
 
-  installation:
-    container_name: app
+  migration:
     build: .
-    image: iqtrello
-    command: pip install -r requirements.txt
+    image: app
+    command: python manage.py migrate
+    volumes:
+      - .:/django_mongodb_docker
+    links:
+      - mongodb
+    depends_on:
+      - make_migrations
 
-
-
-#  makemigration:
-#    build: .
-#    image: makemigration
-#    command: python manage.py makemigrations
-#    depends_on:
-#      - testcon
-
-#  iqtrelloapp:
-#    stdin_open: true
-#    tty: true
-#    image: iqtrello
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#    depends_on:
-#      - mongodb
-#      - migration
-#    ports:
-#      - '8000:8000'
+  make_migrations:
+    build: .
+    image: app
+    command: python manage.py makemigrations
+    volumes:
+      - .:/django_mongodb_docker
+    links:
+      - mongodb
+    depends_on:
+      - mongodb
