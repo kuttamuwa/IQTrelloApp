@@ -23,7 +23,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: 'test_connection'
+    container_name: 'test_connection'  # burasi duzgun calisiyor
     command: python ctest.py
     depends_on:
       - db
@@ -72,7 +72,7 @@ services:
       dockerfile: Dockerfile
     image: django
     container_name: 'django_makemigrations'
-    command: python manage.py makemigrations
+    command: python manage.py makemigrations  # nedense connection refused hatasi veriyor.
     links:
       - db
     depends_on:
