@@ -13,14 +13,17 @@ Python >= 3.6
 We recommend you to use pip
 pip install -r requirements.txt 
 
+# Database 
+You need to create a database in mongo and set it in 
+databases section of settings.py
 
-# 2. Step
+# 1. Step
 Do not forget to activate your env via source / activate.bat
 
 python manage.py makemigrations
 python manage.py migrate
 
-# 3. Step
+# 2. Step
 You should create your super user in Django before run server
 python manage.py createsuperuser
 
