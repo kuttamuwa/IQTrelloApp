@@ -24,7 +24,7 @@ SECRET_KEY = '=%rh(tf$+0vph!h1x**-4rpnl50hw2un)zqwsd0nrh3o7!s_=u'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -86,17 +86,12 @@ WSGI_APPLICATION = 'IQTrelloLatest.wsgi.application'
 
 DATABASES = {
     'default': {
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         'ENGINE': 'djongo',
-        'ENFORCE_SCHEMA': True,
-        'NAME': 'iqtrellodb',
-        'HOST': 'mongodb',
+        'NAME': 'django_mongodb',
+        'HOST': 'db',
         'PORT': 27017,
         'USER': 'root',
         'PASSWORD': 'mongoadmin',
-        'AUTH_SOURCE': 'admin',
-        'AUTH_MECHANISM': 'SCRAM-SHA-1',
     }
 }
 
@@ -149,7 +144,6 @@ INTERNAL_IPS = [
     'localhost'
 ]
 
-
 JWT_AUTH = {
     'JWT_ALLOW_REFRESH': True,
     'JWT_EXPIRATION_DELTA': timedelta(hours=2),
@@ -163,4 +157,3 @@ JWT_AUTH = {
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
     'TOKEN_TYPE_CLAIM': 'token_type',
 }
-

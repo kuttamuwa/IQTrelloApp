@@ -1,63 +1,85 @@
-version: '3.1'
-
-volumes:
-  init-db:
-  data-db:
+version: "3"
 
 services:
-  mongodb:
+
+  # Mongo DB
+  db:
     image: mongo
     restart: always
-    volumes:
-      - ./init-db:/docker-entrypoint-initdb.d
-      - ./data-db:/data/db
+    container_name: 'mongo_container'
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: mongoadmin
-      MONGO_INITDB_DATABASE: iqtrellodb
+      - MONGO_INITDB_DATABASE=django_mongodb
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=mongoadmin
     ports:
-      - 27017:27017
+      - '27017-27019:27017-27019'
+    networks:
+      - app-network
 
-  mongo-express:
-    image: mongo-express
-    restart: always
-    ports:
-      - 8081:8081
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: mongoadmin
-
-  web:
-    image: app
-    restart: always
-    command: python manage.py runserver 0.0.0.0:8000
-    volumes:
-      - .:/django_mongodb_docker
-    ports:
-      - 8000:8000
-    links:
-      - mongodb
+  # test connection
+  testconnection:
+    image: django
+#    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: 'test_connection'
+    command: python ctest.py
     depends_on:
-      - migration
+      - db
+    networks:
+      - app-network
 
-  migration:
-    build: .
-    image: app
-    command: python manage.py migrate
+  # Django initial
+  backend:
+    image: django
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: 'django_container'
+    command: python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - db
     volumes:
-      - .:/django_mongodb_docker
+      - .:/home/django_mongodb
+    ports:
+      - "8000:8000"
     links:
-      - mongodb
+      - db
+    networks:
+      - app-network
+
+  # Django migrate
+  migration:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: django
+    container_name: 'django_migrate'
+    command: python manage.py migrate
+    links:
+      - db
     depends_on:
       - make_migrations
+    networks:
+      - app-network
 
+  # Django makemigratios
   make_migrations:
-    build: .
-    image: app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: django
+    container_name: 'django_makemigrations'
     command: python manage.py makemigrations
-    volumes:
-      - .:/django_mongodb_docker
     links:
-      - mongodb
+      - db
     depends_on:
-      - mongodb
+      - db
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

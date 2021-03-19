@@ -1,19 +1,16 @@
 # IQ Vizyon Trello Application
-Sample Trello application for IQ Vizyon with DRF and MongoDB
+Sample Trello application for IQ Vizyon with DRF/ORM and MongoDB
 Web socket is provided by Django
 API is provided by DRF (Django Rest Framework)
+
 Djongo is used to manage models and controllers with MongoDB.
 
+yagmail is used to send mails.
 
 # Installation
 Python >= 3.6
 
-You can use environment.yml if you wish to use conda.
-However, some libraries may not be installed properly such as Djongo and Yagmail which are required libraries
-to create collections into MongoDB while protecting Django ORM with Djongo.
-Yagmail is also useful library to send mails on SMTP protocols.
-
-So that, we recommend you to use to install libs
+We recommend you to use pip
 pip install -r requirements.txt 
 
 
@@ -22,16 +19,23 @@ Do not forget to activate your env via source / activate.bat
 
 python manage.py makemigrations
 python manage.py migrate
-* python manage.py runserver
 
 # 3. Step
 You should create your super user in Django before run server
 python manage.py createsuperuser
 
 Then you can run server.
+* python manage.py runserver
+
+# ! Note ! :
+You should set DEBUG=False if you want to create some init data.
+Do not set True before you migrate and createsuperuser.
 
 # API Endpoints
 /cards
 /comments
 /boards
 
+# Docker
+I couldn't fully handle with docker and docker-compose. Yet, there is Dockerfile and docker-compose.yml
+You can solve if you will.
